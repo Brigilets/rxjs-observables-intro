@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription, interval, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-home',
@@ -18,7 +19,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       let count: number = 0;
       setInterval(() => {
         observer.next(count);
-        if (count === 2) observer.complete();
+        if (count === 5) observer.complete();
         if (count > 3) {
           observer.error(new Error('Count is greater than 3'));
         }
@@ -26,18 +27,24 @@ export class HomeComponent implements OnInit, OnDestroy {
       }, 1000);
     });
 
-    this.firstObservableSubscription = customIntervalObservable.subscribe(
-      (count: number) => {
-        console.log(count);
-      },
-      (error) => {
-        console.log('Error encountered,no need to unsubscribe', error);
-        alert(error.message);
-      },
-      () => {
-        console.log('Emitting is completed, no need to unsubscribe');
-      }
-    );
+    this.firstObservableSubscription = customIntervalObservable
+      .pipe(
+        map((data: number) => {
+          return 'Round: ' + (data + 1);
+        })
+      )
+      .subscribe(
+        (data) => {
+          console.log(data);
+        },
+        (error) => {
+          console.log('Error encountered,no need to unsubscribe', error);
+          alert(error.message);
+        },
+        () => {
+          console.log('Emitting is completed, no need to unsubscribe');
+        }
+      );
   }
 
   ngOnDestroy(): void {
